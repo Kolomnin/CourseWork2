@@ -1,92 +1,56 @@
 import java.time.LocalDateTime;
+import java.util.Objects;
 
-public class Task implements Repeatable {
-    private String head;
+public class Task {
+    private static int idGenerator = 0;
+    private final Integer id = idGenerator++;
+    private String header;
     private String description;
-    private final TaskType taskType;
-    private final RepeatTape repeatTape;
-    private final LocalDateTime dateTime;
-    private final int id;
-    private static int countId = 1;
+    private LocalDateTime deadline;
+    private final Boolean isPersonalTask;
 
-
-    public Task(String head, String description, TaskType taskType,
-                LocalDateTime dateTime, RepeatTape repeatTape) throws RuntimeException {
-        setHeader(head);
+    public Task(String header, String description, LocalDateTime deadline,
+                Boolean isPersonalTask) {
+        setHeader(header);
         setDescription(description);
-        this.taskType = taskType;
-        this.dateTime = dateTime;
-        this.repeatTape = repeatTape;
-        this.id = countId++;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public String getHead() {
-        return head;
-    }
-
-    public void setHeader(String header) throws RuntimeException {
-        try {
-            if (header == null || header.isBlank()) {
-                throw new RuntimeException("Введите заголовок");
-            } else {
-                this.head = head;
-            }
-        } catch (RuntimeException e) {
-            System.out.println("e.getMessage() = " + e.getMessage());
-        }
-    }
-
-    public String getDescription() {
-        return description;
+        this.deadline = deadline;
+        this.isPersonalTask = isPersonalTask;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public void setDescription(String description) throws RuntimeException {
-        try {
-            if (description == null || description.isBlank()) {
-                throw new RuntimeException("Заполнить описание");
-            } else {
-                this.description = description;
-            }
-        } catch (RuntimeException e) {
-            System.out.println("e.getMessage() = " + e.getMessage());
-        }
+    protected LocalDateTime getDeadline() {
+        return deadline;
     }
 
-    public TaskType getTaskType() {
-        return taskType;
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
-        return "Задача {" +
-                "№ =" + id +
-                ", заголовок ='" + head + '\'' +
-                ", описание ='" + description + '\'' +
-                ", тип задачи =" + taskType.getType() +
-                ", дата =" + dateTime +
-                ", " + repeatTape.getName() + nextTime() +
-                '}';
+        String s = "личная";
+        if (!isPersonalTask) s = "рабочая";
+        return id + "   " + header + ": " + description + "\nТип задачи: " + s;
 
     }
-
-    @Override
-    public RepeatTape nextTime() {
-        switch (repeatTape) {
-            case ONE_TIME -> System.out.println(dateTime.plusDays(0));
-            case EVERYDAY -> System.out.println(dateTime.plusDays(1));
-            case WEEKLY -> System.out.println(dateTime.plusWeeks(1));
-            case MONTHLY -> System.out.println(dateTime.plusMonths(1));
-            case ANNUAL -> System.out.println(dateTime.plusYears(1));
-        }
-        return repeatTape;
-    }
-
 }
